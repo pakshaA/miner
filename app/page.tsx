@@ -1,95 +1,60 @@
-import Image from "next/image";
+'use client'
+
+import { useState } from "react";
+
 import styles from "./page.module.css";
 
+import { SettingsMenu } from "./components/settings/settings";
+import { ButtonContainer } from "./components/button-container/buttonContainer";
+import { Overlay } from "./components/overlay/overlay";
+import { Popup } from "./components/popup/popup";
+import { Map } from "./components/map/map";
+
+import { initArray } from './scripts/mapArray';
+import { settings } from "./templates/templates";
+
+type Cell = number | string
+
+
 export default function Home() {
+  const [selectedSettings, setSelectedSettings] = useState<number | null>(null)
+  const [isOpen, setPopUpIsOpen] = useState<boolean>(false)
+  const [map, setMap] = useState<Cell[][]>([[]])
+  const [isVisible, setIsVisible] = useState<boolean>(false)
+
+  const handleSettingsChange = (id: number) => {
+    setSelectedSettings(id)
+  }
+
+  const openPopup = () => {
+    setPopUpIsOpen(true)
+  }
+
+  const closePopup = () => {
+    setPopUpIsOpen(false)
+  }
+
+  const handleClickStart = () => {
+    if (selectedSettings !== null) {
+      var arr: Cell[][] = initArray(selectedSettings)
+      setIsVisible(true)
+      console.log(arr)
+      setMap([])
+      setMap(arr)
+    } else {
+      alert('Выберите настройки игры')
+    }
+
+  }
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+      <SettingsMenu handleSettingsChange={handleSettingsChange} />
+      <ButtonContainer onClickPopUp={openPopup} onClickStart={handleClickStart} />
+      <Map map={map} isVisible={isVisible} />
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      <Overlay isOpened={isOpen} closePopup={closePopup} />
+      <Popup isOpened={isOpen} closePopup={closePopup}></Popup>
     </main>
   );
 }
